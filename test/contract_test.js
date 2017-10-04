@@ -1,4 +1,4 @@
- solc = require('solc');
+var solc = require('solc');
 var Web3 = require('web3');
 
 var fs = require('fs');
@@ -12,8 +12,11 @@ var web3 = new Web3(new Web3.providers.HttpProvider(process.env.ETH_NODE));
 var accounts;
 var creator;
 
-var mntContractAddress;
-var mntContract;
+var tokenContractAddress;
+var tokenContract;
+
+var voteContractAddress;
+var voteContract;
 
 eval(fs.readFileSync('./test/helpers/misc.js')+'');
 
@@ -28,11 +31,10 @@ describe('Contracts 1', function() {
                accounts = as;
                creator = accounts[0];
 
-               var contractName = ':GoldmintVote1';
-               getContractAbi(contractName,function(err,abi){
-                    ledgerAbi = abi;
-
-                    done();
+               deploySampleTokenContract(function(err){
+                    deployVoteContract(function(err){
+                         done();
+                    });
                });
           });
      });
@@ -41,8 +43,79 @@ describe('Contracts 1', function() {
           done();
      });
 
-     it('should ',function(done){
-          done();
+     it('should not vote if no tokens',function(done){
+          var params = {from: creator, gas: 2900000};
+
+          voteContract.vote(true,params,function(err){
+               assert.notEqual(err,null);
+               done();
+          });
+     });
+
+     it('should issue tokens',function(done){
+          var params = {from: creator, gas: 2900000};
+
+          tokenContract.issueTokens(creator,1000,params,function(err){
+               assert.equal(err,null);
+
+               var am = tokenContract.balanceOf(creator);
+               assert.equal(am.toString(10),1000);
+
+               done();
+          });
+     });
+
+     it('should not vote if less than 1 ETH tokens',function(done){
+          var params = {from: creator, gas: 2900000};
+          voteContract.vote(true,params,function(err){
+               assert.notEqual(err,null);
+               done();
+          });
+     });
+
+     it('should issue a lot of tokens',function(done){
+          var params = {from: creator, gas: 2900000};
+
+          var oneEth = 1000000000000000000;
+          tokenContract.issueTokens(creator,oneEth,params,function(err){
+               assert.equal(err,null);
+
+               var am = tokenContract.balanceOf(creator);
+               assert.equal(am.toString(10),1000000000000000000);
+
+               done();
+          });
+     });
+
+     it('should vote',function(done){
+          var params = {from: creator, gas: 2900000};
+
+          var totalVotes = voteContract.totalVotes();
+          assert.equal(totalVotes,0);
+
+          voteContract.vote(true,params,function(err){
+               assert.equal(err,null);
+
+               var res = voteContract.getVoteBy(creator);
+               assert.equal(res,true);
+
+               var totalVotes = voteContract.totalVotes();
+               assert.equal(totalVotes,1);
+
+               var votedYes = voteContract.votedYes();
+               assert.equal(votedYes,1);
+
+               done();
+          });
+     });
+
+     it('should not vote again',function(done){
+          var params = {from: creator, gas: 2900000};
+          voteContract.vote(true,params,function(err){
+               assert.notEqual(err,null);
+
+               done();
+          });
      });
 
 });
