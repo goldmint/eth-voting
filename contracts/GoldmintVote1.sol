@@ -31,6 +31,7 @@ contract StdToken {
 contract GoldmintVote1 {
 // Fields:
      address public creator = 0x0;
+     bool public stopped = false;
      StdToken mntpToken; 
 
      mapping(address => bool) isVoted;
@@ -47,6 +48,8 @@ contract GoldmintVote1 {
      }
 
      function vote(bool _answer) public {
+          require(!stopped);
+
           // 1 - should be Goldmint MNTP token holder 
           // with >1 MNTP token balance
           uint256 balance = mntpToken.balanceOf(msg.sender);
@@ -68,6 +71,11 @@ contract GoldmintVote1 {
      function getVoteBy(address _a) public constant returns(bool) {
           require(isVoted[_a]==true);
           return votes[_a];
+     }
+
+     function stop() public {
+          require(msg.sender==creator);
+          stopped = true;
      }
 }
 
