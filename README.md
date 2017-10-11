@@ -1,4 +1,9 @@
 # Goldmint Vote1 smart contracts/DApp
+This is a voting contract/DApp. It allows Goldmint token holders to vote.
+
+The approach is opposite to **CarbonVote**. We do not require any token transfers.
+Just own some MNTP tokens and call **vote** method.
+
 
 # To run tests:
 
