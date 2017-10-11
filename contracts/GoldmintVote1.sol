@@ -53,7 +53,7 @@ contract GoldmintVote1 {
           // 1 - should be Goldmint MNTP token holder 
           // with >1 MNTP token balance
           uint256 balance = mntpToken.balanceOf(msg.sender);
-          require(balance>=1 ether);
+          require(balance>=10 ether);
 
           // 2 - can vote only once 
           require(isVoted[msg.sender]==false);

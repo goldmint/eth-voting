@@ -76,12 +76,12 @@ describe('Contracts 1', function() {
      it('should issue a lot of tokens',function(done){
           var params = {from: creator, gas: 2900000};
 
-          var oneEth = 1000000000000000000;
-          tokenContract.issueTokens(creator,oneEth,params,function(err){
+          var tenEth = 10000000000000000000;
+          tokenContract.issueTokens(creator,tenEth,params,function(err){
                assert.equal(err,null);
 
                var am = tokenContract.balanceOf(creator);
-               assert.equal(am.toString(10),1000000000000000000);
+               assert.equal(am.toString(10),10000000000000000000);
 
                done();
           });
